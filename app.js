@@ -14,7 +14,20 @@ app.get('/', (req, res) => {
 })
 
 app.get('/restaurants', (req, res) => {
-  res.render('index', { restaurants })
+  const keyword = req.query.search?.trim()
+  const checkPropertyIncludesKeyword = function (property) {
+    if (typeof property === 'string') {
+      return property.toLowerCase().includes(keyword.toLowerCase())
+    }
+    return false
+  }
+
+  const matchedRestaurant = keyword ? restaurants.filter((rt) => {
+    return checkPropertyIncludesKeyword(rt.name) ||
+      checkPropertyIncludesKeyword(rt.name_en) ||
+      checkPropertyIncludesKeyword(rt.category)
+  }) : restaurants
+  res.render('index', { restaurants: matchedRestaurant, keyword })
 })
 
 app.get('/restaurant/:id', (req, res) => {
